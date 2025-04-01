@@ -218,33 +218,6 @@
 	__parse_dependencies .right(.tcount({dependencies}) - 1, {dependencies})
 .endmac
 
-; ================================================================================================
-; Uppercase aliases for above macros. If you use mixed case for whatever reason, feel free to
-; leave a pull request with the other 16382 permutations
-.macro .ROUTINE name
-	.routine name
-.endmac
-
-.macro .ENDROUTINE
-	.endroutine
-.endmac
-
-.macro .GLOBALROUTINE name, public_locals
-	.globalroutine name, public_locals
-.endmac
-
-.macro .DECLAREROUTINE name
-	.declareroutine name
-.endmac
-
-.macro .CALLS dependencies
-	.calls dependencies
-.endmac
-
-.macro .ALLOCATELOCAL name, width
-	.allocatelocal name, width
-.endmac
-
 ; Only provide JSR overload if requested
 .if ::CALL65_SAFE_JSR <> 0
 	.feature	ubiquitous_idents +
