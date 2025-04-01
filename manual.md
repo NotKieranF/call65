@@ -12,8 +12,7 @@ This library intends to remedy the situation by providing a few useful pseudo-di
 
 Analogous to `.proc`.
 Starts a new routine scope with the given name.
-Cannot be nested, and must be forward declared with `.globalroutine`.
-An alternative method of forward declaration may be introduced later for routines within the same translation unit, but it's not currently a priority.
+Cannot be nested, and must be forward declared with `.globalroutine` or `.declareroutine`.
 
 ### `.endroutine`
 
@@ -26,7 +25,10 @@ Analogous to `.global`.
 Exports a routine and associated local variables if used in the same translation unit as the specified routine, or imports them if not.
 Multiple local variables can be specified as a space separated list.
 
-Local variables can be accessed as `z:routine_name::local_name`.
+### `.declareroutine name`
+
+Forward declares the scope for a routine.
+This is necessary, as otherwise ca65 gives a 'scope not found' error when attempting to access the local variables of a routine before actually defining it.
 
 ### `.calls routine ...`
 
@@ -41,6 +43,8 @@ Specifically, this directive allocates enough scratch space such that subsequent
 
 Allocates space for a local variable in scratch space.
 Size is assumed to be a single byte if left blank.
+
+Local variables can be accessed as `z:routine_name::local_name`.
 
 ## Options
 

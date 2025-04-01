@@ -31,6 +31,7 @@
 ; - .routine
 ; - .endroutine
 ; - .globalroutine
+; - .declareroutine
 ; - .calls
 ; - .allocatelocal
 
@@ -101,6 +102,18 @@
 
 	; Globalize local stack size
 	.globalzp	.ident(.sprintf("%s__LOCAL_STACK_SIZE__", .string(name)))
+
+	; Define a unique symbol to facilitate dependency error checking
+	::.ident(.sprintf("%s__EXISTS__", .string(name))) = 1
+.endmac
+
+; ================================================================================================
+; Forward declare a routine to be used in the same translation unit
+;	name: name of routine and local variable scope to forward declare
+.macro	.declareroutine name
+	; Forward declare scope for public locals
+	.scope	name
+	.endscope
 
 	; Define a unique symbol to facilitate dependency error checking
 	::.ident(.sprintf("%s__EXISTS__", .string(name))) = 1
