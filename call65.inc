@@ -218,6 +218,33 @@
 	__parse_dependencies .right(.tcount({dependencies}) - 1, {dependencies})
 .endmac
 
+; ================================================================================================
+; Uppercase aliases for above macros. If you use mixed case for whatever reason, feel free to
+; leave a pull request with the other 16382 permutations
+.macro .ROUTINE name
+	.routine name
+.endmac
+
+.macro .ENDROUTINE
+	.endroutine
+.endmac
+
+.macro .GLOBALROUTINE name, public_locals
+	.globalroutine name, public_locals
+.endmac
+
+.macro .DECLAREROUTINE name
+	.declareroutine name
+.endmac
+
+.macro .CALLS dependencies
+	.calls dependencies
+.endmac
+
+.macro .ALLOCATELOCAL name, width
+	.allocatelocal name, width
+.endmac
+
 ; Only provide JSR overload if requested
 .if ::CALL65_SAFE_JSR <> 0
 	.feature	ubiquitous_idents +
@@ -226,7 +253,7 @@
 	; Version of JSR with error checking. Emits a warning if target is not present in dependency list
 	; when called within the scope of a routine
 	;	target: target routine to be called
-	.macro	JSR target
+	.macro	jsr target
 		; Emit requested code
 		.byte $20, <target, >target
 
@@ -246,15 +273,6 @@
 		.endif
 	.endmac
 
-
-	; ================================================================================================
-	; Alias for JSR. If you use mixed case opcode for whatever reason, feel free to leave a pull
-	; request with the other six permutations
-	;	target: target routine to be called
-	.macro	jsr target
-		JSR target
-	.endmac
-
 	; ================================================================================================
 	; Recursive helper macro for safe JSR
 	;	target: symbol to check for
@@ -272,6 +290,12 @@
 
 		; Hold my macro, I'm going in!
 		__check_dependencies target, .right(.tcount({dependencies}) - 1, {dependencies})
+	.endmac
+
+	; ================================================================================================
+	; Uppercase aliases for above macros.
+	.macro	JSR target
+		jsr target
 	.endmac
 .endif
 
