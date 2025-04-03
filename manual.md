@@ -80,7 +80,7 @@ Generally, `.calls` directives can be split and reordered arbitrarily, and `.all
 
 For example, the following routine:
 ```
-.routine branch
+.routine stem
 	.calls leaf
 	.allocatelocal foo
 	.allocatelocal bar
@@ -100,7 +100,7 @@ For example, the following routine:
 Can be optimized to:
 
 ```
-.routine branch
+.routine stem
 	.allocatelocal foo
 	.calls leaf
 	.allocatelocal bar
