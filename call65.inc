@@ -92,6 +92,12 @@
 ;	name: name of routine and local variable scope to globalize
 ;	public_locals: space separated list of local variables to expose publicly
 .macro	.globalroutine name, public_locals
+	; Check whether routine is doubly defined
+	.ifdef .ident(.sprintf("%s__EXISTS__", .string(name)))
+		.error .sprintf("\x1B[1;31m%s is doubly defined!\x1B[0m", .string(name))
+		.fatal ""
+	.endif
+
 	; Globalize routine address
 	.global	name
 
@@ -109,14 +115,28 @@
 
 ; ================================================================================================
 ; Forward declare a routine to be used in the same translation unit
-;	name: name of routine and local variable scope to forward declare
-.macro	.declareroutine name
+;	names: space separated list of routine local variable scopes to forward declare
+.macro	.declareroutine names
+	; Recursive base case
+	.ifblank names
+		.exitmac
+	.endif
+
+	; Check whether routine is doubly defined
+	.ifdef .ident(.sprintf("%s__EXISTS__", .string(.left(1, {names}))))
+		.error .sprintf("\x1B[1;31m%s is doubly defined!\x1B[0m", .string(.left(1, {names})))
+		.fatal ""
+	.endif
+
 	; Forward declare scope for public locals
-	.scope	name
+	.scope	.left(1, {names})
 	.endscope
 
 	; Define a unique symbol to facilitate dependency error checking
-	::.ident(.sprintf("%s__EXISTS__", .string(name))) = 1
+	::.ident(.sprintf("%s__EXISTS__", .string(.left(1, {names})))) = 1
+
+	; Recur
+	.declareroutine .right(.tcount({names}) - 1, {names})
 .endmac
 
 ; ================================================================================================

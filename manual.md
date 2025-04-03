@@ -25,9 +25,10 @@ Analogous to `.global`.
 Exports a routine and associated local variables if used in the same translation unit as the specified routine, or imports them if not.
 Multiple local variables can be specified as a space separated list.
 
-### `.declareroutine name`
+### `.declareroutine name ...`
 
 Forward declares the scope for a routine.
+Multiple routines can be specified as a space separated list.
 This is necessary, as otherwise ca65 gives a 'scope not found' error when attempting to access the local variables of a routine before actually defining it.
 
 ### `.calls routine ...`
