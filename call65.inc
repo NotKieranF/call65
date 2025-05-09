@@ -101,10 +101,12 @@
 	; Globalize routine address
 	.global	name
 
-	; Globalize properly scoped public locals
-	.scope	name
-		__parse_public_locals {public_locals}
+	; Forward declare named scope for public locals
+	.scope name
 	.endscope
+
+	; Globalize mangled local symbols, add un-mangled symbols to named scope
+	__parse_public_locals name, {public_locals}
 
 	; Globalize local stack size
 	.globalzp	.ident(.sprintf("%s__LOCAL_STACK_SIZE__", .string(name)))
@@ -128,8 +130,8 @@
 		.fatal ""
 	.endif
 
-	; Forward declare scope for public locals
-	.scope	.left(1, {names})
+	; Forward declare named scope for public locals
+	.scope .left(1, {names})
 	.endscope
 
 	; Define a unique symbol to facilitate dependency error checking
@@ -173,9 +175,14 @@
 		.fatal ""
 	.endif
 
-	; Declare local copy of the variable location, along with properly scoped version for exporting
+	; Declare local copy of the variable location, along with globally scoped mangled version for exporting
 	name = __LOCAL_STACK__
-	__ROUTINE_NAME__::name = name
+	::.ident(.sprintf("__%s_%s", .string(__ROUTINE_NAME__), .string(name))) = name
+
+	; Add un-mangled version to routine scope if it doesn't exist already
+	.ifndef ::__ROUTINE_NAME__::name
+		::__ROUTINE_NAME__::name = name
+	.endif
 
 	; Increment local stack
 	.define __TEMP__ __LOCAL_STACK__
@@ -187,24 +194,28 @@
 	.endif
 	.undefine __TEMP__
 
-	; Verify that we haven't overflown the local scratch space
-	.assert __LOCAL_STACK__ <= __SCRATCH_START__ + __SCRATCH_SIZE__, error, .sprintf("\x1B[1;31mOverflowed local variable scratch space!\x1B[0m")
+	; Verify that we haven't overflowed the local scratch space
+	.assert __LOCAL_STACK__ <= __SCRATCH_START__ + __SCRATCH_SIZE__, error, .sprintf("\x1B[1;31mOverflowed local variable scratch space in %s!\x1B[0m", .string(__ROUTINE_NAME__))
 .endmac
 
 ; ================================================================================================
 ; Recursive helper macro for .globalroutine
+;	name: name of enclosing routine
 ;	public_locals: space separated list of local variables to expose publicly
-.macro	__parse_public_locals public_locals
+.macro	__parse_public_locals name, public_locals
 	; Recursive base case
 	.ifblank public_locals
 		.exitmac
 	.endif
 
-	; Globalize public local as a zeropage symbol
-	.globalzp .left(1, {public_locals})
+	; Globalize mangled local symbol as zeropage
+	.globalzp .ident(.sprintf("__%s_%s", .string(name), .string(.left(1, {public_locals}))))
+
+	; Add un-mangled local symbol to routine scope
+	name::.left(1, {public_locals}) = .ident(.sprintf("__%s_%s", .string(name), .string(.left(1, {public_locals}))))
 
 	; The ol' parse-a-roo
-	__parse_public_locals .right(.tcount({public_locals}) - 1, {public_locals})
+	__parse_public_locals name, .right(.tcount({public_locals}) - 1, {public_locals})
 .endmac
 
 ; ================================================================================================
