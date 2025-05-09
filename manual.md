@@ -6,6 +6,14 @@ Due to limitations in the design of the 6502 CPU&mdash;too few registers, no sta
 
 This library intends to remedy the situation by providing a few useful pseudo-directives  to facilitate declaring, allocating, and exporting local variables across translation units using a header system similar to what is common in C.
 
+### Setup
+
+The call65 library requires minimal setup to integrate into a project. All that is needed is a memory area in the zeropage called `SCRATCH` with the `define = yes` attribute for local variables to be placed in. For example, the following linker configuration line will define scratch space at the start of zeropage with 16 bytes of capacity:
+
+`SCRATCH: start = $00, size = $10, type = rw, file = "", define = yes`
+
+Alternatively, `__SCRATCH_START__` and `__SCRATCH_SIZE__` symbols can be manually defined in `call65.inc`.
+
 ## Psuedo-directives
 
 ### `.routine name`
