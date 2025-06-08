@@ -259,7 +259,7 @@
 	;	target: target routine to be called
 	.macro	jsr target
 		; Emit requested code
-		.byte $20, <target, >target
+		.byte $20, <(target), >(target)
 
 		; Don't perform dependency check if we're outside of a routine scope
 		.if .xmatch(__ROUTINE_NAME__, .ident("__ROUTINE_NAME__"))
